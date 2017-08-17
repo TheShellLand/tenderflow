@@ -2,6 +2,7 @@
 http://machinelearningmastery.com/text-generation-lstm-recurrent-neural-networks-python-keras/
 """
 
+import os
 import numpy
 from keras import metrics
 from keras.models import Sequential
@@ -14,11 +15,10 @@ from keras.layers import Activation
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 from keras import backend as K
-import os
 
 
 # load ascii text and convert to lowercase
-filename = 'dataset/training/wonderland.txt'
+filename = '../dataset/training/wonderland.txt'
 raw_text = open(filename, 'r', encoding='utf-8').read()
 raw_text = raw_text.lower()
 
@@ -55,7 +55,7 @@ y_train = np_utils.to_categorical(dataY)
 model = Sequential()
 # model.add(LSTM(256, input_shape=(x_train.shape[1], x_train.shape[2])))
 model.add(GRU(256, input_shape=(x_train.shape[1], x_train.shape[2])))
-model.add(Dropout(0.5))
+model.add(Dropout(0.2))
 model.add(Dense(y_train.shape[1], activation='relu'))
 # model.add(Dropout(0.5))
 model.compile(loss='categorical_crossentropy',
@@ -73,18 +73,34 @@ checkpoint = ModelCheckpoint(filepath,
 
 callbacks_list = [checkpoint]
 
+
 # load and resume from latest model
-newest_model = lambda files: os.listdir(files) if os.path.isdir(files) else None
-newest_model = newest_model('checkpoints')
+def newest_model(path):
+    """Return the newest model in path"""
+    ml = []
 
-if newest_model:
-    newest_model = list(map(lambda file: 'checkpoints' + '/' + file, newest_model))
-    nm_stats = list(map(lambda x: x.st_mtime, [os.stat(file) for file in newest_model]))
-    newest_model = dict(zip(nm_stats, newest_model))
-    newest_model = newest_model[max(sorted(list(newest_model)))]
-    print('Loading existing model', newest_model)
+    if os.path.isdir(path):
+        for item in os.listdir(path):
+            item = path + '/' + item
+            if os.path.exists(path):
+                if not os.path.isdir(item):
+                    ml.append(item)
 
-    model = load_model(newest_model)
+    if not ml:
+        return False
+
+    ml = list(map(lambda file: file, ml))
+    ml_stats = list(map(lambda x: x.st_mtime, [os.stat(file) for file in ml]))
+    ml = dict(zip(ml_stats, ml))
+    ml = ml[max(sorted(list(ml)))]
+
+    return ml
+
+new_m = newest_model('checkpoints')
+if new_m:
+    print('Loading existing model', new_m)
+
+    model = load_model(new_m)
     history = model.fit(x_train, y_train,
                         epochs=1000000,
                         batch_size=128,
