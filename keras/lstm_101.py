@@ -104,6 +104,61 @@ def word2vec(dataset):
     pass
 
 
+def supervised(x, y):
+    """
+    The majority of practical machine learning uses supervised learning.
+
+    - Classification: A classification problem is when the output variable
+    is a category, such as “red” or “blue” or “disease” and “no disease”.
+
+    - Regression: A regression problem is when the output variable is a real
+    value, such as “dollars” or “weight”.
+
+    :return:
+    """
+    pass
+
+
+def unsupervised(x):
+    """
+    - Clustering: A clustering problem is where you want to discover
+    the inherent groupings in the data, such as grouping customers by
+    purchasing behavior.
+
+    - Association:  An association rule learning problem is where you want
+    to discover rules that describe large portions of your data, such as
+    people that buy X also tend to buy Y.
+
+    :param x:
+    :return:
+    """
+    pass
+
+
+def semisuperfized(more_x, less_y):
+    """
+    Problems where you have a large amount of input data (X) and only
+    some of the data is labeled (Y) are called semi-supervised learning
+    problems.
+
+    A good example is a photo archive where only some of the images are
+    labeled, (e.g. dog, cat, person) and the majority are unlabeled.
+
+    - You can use unsupervised learning techniques to discover and learn
+    the structure in the input variables.
+
+    - You can also use supervised learning techniques to make best guess
+    predictions for the unlabeled data, feed that data back into the
+    supervised learning algorithm as training data and use the model to
+    make predictions on new unseen data.
+
+
+    :param more_x:
+    :param less_y:
+    :return:
+    """
+    pass
+
 
 
 
