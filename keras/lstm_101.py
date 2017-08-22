@@ -18,6 +18,7 @@ from os import listdir
 from os.path import isfile, join
 
 import numpy
+import numpy as np
 
 
 ds = '../dataset/training/wonderland.txt'
@@ -50,28 +51,37 @@ def char2vec(dataset):
 
     n_chars = raw_text.__len__()
     vocab_size = chars.__len__()
+    features = vocab_size
 
-    print('[*] Total Characters:', n_chars)
+    print('[*] Corpus Length:', n_chars)
     print('[*] Total Vocabulary (unique set):', vocab_size)
 
-    x = []
-    y = []
+    X = []
+    Y = []
 
     for i in range(0, n_chars - seq_length, 1):
-        sequence_in = raw_text[i:i + seq_length]    # 'project gutenberg’s alice’s adventures in wonderland, by lewis carroll this ebook is for the use o'
-        sequence_out = raw_text[i + seq_length]     # 'f'
+        X.append(raw_text[i: i + seq_length])
+        Y.append(raw_text[i + seq_length])
 
-        x.append(list(map(lambda x: char_to_int[x], sequence_in)))
-        y.append(char_to_int[sequence_out])
-
-    n_patterns = x.__len__()
+    n_patterns = X.__len__()
+    samples = n_patterns
+    timesteps = seq_length
 
     print('[*] Total Patterns', n_patterns)
+
+    print('[*] Vectorization...')
+    x = np.zeros((samples, timesteps, features), dtype=np.bool)
+    y = np.zeros((samples, features), dtype=np.bool)
+    for i, sentence in enumerate(X):
+        for t, char in enumerate(sentence):
+            x[i, t, char_to_int[char]] = 1
+        y[i, char_to_int[Y[i]]] = 1
+
 
     # The input sequences that might vary in length between 1 and max_len and
     # therefore require zero padding. Here, we use left-hand-side
     # (prefix) padding with the Keras built in pad_sequences() function.
-    x = pad_sequences(x, maxlen=seq_length, dtype='float32')        # shape: (163717, 100)
+    # x = pad_sequences(x, maxlen=seq_length, dtype='float32')        # shape: (163717, 100)
 
     # We need to reshape the NumPy array into a format expected by
     # the LSTM networks, that is [samples, time step, features].
@@ -86,23 +96,21 @@ def char2vec(dataset):
     # is the number of features.
     # ;
     # (number of samples, number of timesteps, number of features)
-    samples = n_patterns
-    timesteps = seq_length
-    x = numpy.reshape(x, (samples, timesteps, features))        # shape: (163717, 100, 1)
+    # x = numpy.reshape(x, (samples, timesteps, 1))
 
     # Once reshaped, we can then normalize the input integers to the
     # range 0-to-1, the range of the sigmoid activation functions used
     # by the LSTM network.
-    x = x / float(vocab_size)
+    # x = x / float(features)
 
     # Finally, we can think of this problem as a sequence classification
     # task, where each of the letters represents a different class. As
     # such, we can convert the output (y) to a one hot encoding, using the
     # Keras built-in function to_categorical().
-    y = np_utils.to_categorical(y)
+    # y = np_utils.to_categorical(y)
     output = y.shape[1]
 
-    return x, y, n_chars, vocab_size, samples, timesteps, output, char_to_int, int_to_char
+    return x, y, samples, timesteps, features, output, char_to_int, int_to_char
 
 
 def word2vec(dataset):
@@ -217,13 +225,11 @@ callbacks_list = [
 #############################################################################################
 
 batch_size = 128
-seq_length = 100        # input_length
-features = 1            # input_dim  # input vector shape(?)
+seq_length = 40        # input_length
 epochs = 1000000
 initial_epoch = 0
 
-x_train, y_train, n_chars, vocab_size, samples, timesteps, output, char_to_int, int_to_char = char2vec(ds)
-x, y = x_train, y_train
+x, y, samples, timesteps, features, output, char_to_int, int_to_char = char2vec(ds)
 x_val, y_val = x, y
 
 model = Sequential()
@@ -239,17 +245,20 @@ model = Sequential()
 
 # Dense: 2D, input_shape=(batch_size, input_dim)
 
-model.add(LSTM(256, input_shape=(timesteps, features), return_sequences=True))  # (None, 100, 256)
+model.add(LSTM(128, input_shape=(timesteps, features)))  # (None, 100, 256)
 print(model.output_shape)
 
-model.add(LSTM(256, return_sequences=True))    # (None, 100, 256)
+model.add(Dropout(0.5))     # (None, 256)
 print(model.output_shape)
 
-model.add(Dropout(0.5)) # (None, 256)
-print(model.output_shape)
+# model.add(LSTM(128, return_sequences=True))    # (None, 100, 256)
+# print(model.output_shape)
+#
+# model.add(Dropout(0.2))
+# print(model.output_shape)
 
-model.add(Flatten())      # Flattens 3D -> 2D   # ValueError: Error when checking target: expected activation_1 to have 3 dimensions, but got array with shape (163717, 60)
-print(model.output_shape)
+# model.add(Flatten())      # Flattens 3D -> 2D   # ValueError: Error when checking target: expected activation_1 to have 3 dimensions, but got array with shape (163717, 60)
+# print(model.output_shape)
 
 model.add(Dense(output))    # (None, 60)
 print(model.output_shape)
