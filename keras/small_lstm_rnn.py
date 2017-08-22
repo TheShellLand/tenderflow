@@ -79,6 +79,7 @@ batch_size = 128
 epochs = 1000000
 initial_epoch = 0
 
+
 def new_model():
     # define the model
     model = Sequential()
@@ -145,19 +146,19 @@ if new_m:
     try:
         print('[*] Loading existing model', new_m)
         model = load_model(new_m)
-        model.fit(x_train, y_train,
-                  epochs=epochs,
-                  batch_size=batch_size,
-                  callbacks=callbacks_list,
-                  initial_epoch=initial_epoch)
+        history = model.fit(x_train, y_train,
+                            epochs=epochs,
+                            batch_size=batch_size,
+                            callbacks=callbacks_list,
+                            initial_epoch=initial_epoch)
 
     except ValueError as err:
         print('[*]', err)
         print('[*] Unable to import weights, creating new model')
-        new_model()
+        history = new_model()
 
 else:
-    new_model()
+    history = new_model()
 
 
 
