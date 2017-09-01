@@ -207,6 +207,19 @@ def time_dimension():
     pass
 
 
+def monitoring_fitting():
+    """
+    Overfitting: validation_loss > training_loss
+    If your training loss is much lower than validation loss then this means the
+    network might be overfitting. Solutions to this are to decrease your network
+    size, or to increase dropout. For example you could try dropout of 0.5 and so on.
+
+    Underfitting: training_loss == validation_loss
+    If your training/validation loss are about equal then your model is underfitting.
+    Increase the size of your model (either number of layers or the raw number of
+    neurons per layer)
+    """
+
 
 
 # define the checkpoints
@@ -288,6 +301,7 @@ history = model.fit(x, y,
                     verbose=1,
                     callbacks=callbacks_list,
                     validation_data=(x_val, y_val),
+                    # validation_split=0.33
                     shuffle=False,
                     initial_epoch=initial_epoch)
 
