@@ -29,7 +29,7 @@ load_checkpoint = ''
 
 
 def char2vec(dataset):
-    """Convert dataset into training data
+    """Convert dataset into a one-hot encoded training data
 
     Total Vocab, is also the number of classes
 
@@ -221,6 +221,28 @@ def monitoring_fitting():
     """
 
 
+def why_embedding():
+    """
+    https://www.quora.com/What-is-the-difference-between-using-word2vec-vs-one-hot-embeddings-as-input-to-classifiers
+
+    1. One-hot vectors are high-dimensional and sparse, while word embeddings are
+    low-dimensional and dense (they are usually between 50–600 dimensional). When
+    you use one-hot vectors as a feature in a classifier, your feature vector grows
+    with the vocabulary size; word embeddings are more computationally efficient.
+
+    and more importantly:
+    2. Word embeddings have the ability to generalize, due to semantically similar
+    words having similar vectors, which is not the case in one-hot vectors (each pair
+    of such vectors wi,wjwi,wj has cosine similarity cos(wi,wj)=0cos(wi,wj)=0).
+
+    If your feature vector contains one-hot vectors of the documents’ words, you will
+    only be able to consider features you’ve seen during training; when you use
+    embeddings, semantically similar words will create similar features, and will lead
+    to similar classification.
+
+    """
+
+
 
 # define the checkpoints
 callbacks_list = [
@@ -239,7 +261,7 @@ callbacks_list = [
 
 batch_size = 128
 seq_length = 40        # input_length
-epochs = 1000000
+epochs = 1
 initial_epoch = 0
 
 x, y, samples, timesteps, features, output, char_to_int, int_to_char = char2vec(ds)
@@ -305,6 +327,8 @@ history = model.fit(x, y,
                     shuffle=False,
                     initial_epoch=initial_epoch)
 
+loss, acc = history.history['loss'], history.history['acc']
+print('loss:', loss, 'acc:', acc)
 
 score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
 print(score, acc)
