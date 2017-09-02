@@ -275,6 +275,45 @@ def why_embedding():
     """
 
 
+def lstm_shape():
+    """
+    The shape of an LSTM is a 3D, comprised of (in order):
+        1. number of samples
+        2. number of timesteps
+        3. number of features
+
+        (number of samples, number of timesteps, number of features)
+
+    In keras, the source says LSTM input_shape=(input_length, input_dim)
+    In the numerous examples around the internet "input_length" and "input_dim" have been seen as:
+        - input_shape=(seq_length, features)
+        - input_shape=(height, width)
+        - input_shape=(timesteps, features)
+        - input_shape=(iterations, input vector)
+        - input_shape=(length_of_sequence, number_of_features)
+
+        I know what you're thinking. So many, right? Time to brush up on those SAT synonyms.
+        They all mean the same thing, but when you jump into this and everyone's using their own
+        terminology for everything, you'll just have to get familiar with all of them.
+
+    LSTM: 3D, input_shape=(input_length, input_dim)
+    Example: reshape X to be [samples, time steps, features]
+    Example: reshape X to be [samples, iterations, input vector]
+    Example: (number_of_sequences, length_of_sequence, number_of_features)
+    Documentation: (number of samples, number of timesteps, number of features)
+    Example: model.add(LSTM(64, input_shape=(10, 64)))
+    """
+
+
+def dense_shape():
+    """
+    A dense layer is 2D, comprised of:
+        1. batch size
+        2. input dimension
+
+    Dense: 2D, input_shape=(batch_size, input_dim)
+    """
+
 
 # define the checkpoints
 callbacks_list = [
@@ -300,17 +339,6 @@ x, y, samples, timesteps, features, output, char_to_int, int_to_char = char2vec(
 x_val, y_val = x, y
 
 model = Sequential()
-
-# LSTM: 3D, input_shape=(input_length, input_dim)
-# Example: input_shape=(seq_length, features)
-# Example: input_shape=(height, width)
-# Example: reshape X to be [samples, time steps, features]
-# Example: reshape X to be [samples, iterations, input vector]
-# Example: (number_of_sequences, length_of_sequence, number_of_features)
-# Documentation: (number of samples, number of timesteps, number of features)
-# Example: model.add(LSTM(64, input_shape=(10,64)))
-
-# Dense: 2D, input_shape=(batch_size, input_dim)
 
 model.add(LSTM(128, input_shape=(timesteps, features)))  # (None, 100, 256)
 print(model.output_shape)
