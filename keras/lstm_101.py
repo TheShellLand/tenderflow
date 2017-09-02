@@ -223,7 +223,39 @@ def monitoring_fitting():
 
 def why_embedding():
     """
-    https://www.quora.com/What-is-the-difference-between-using-word2vec-vs-one-hot-embeddings-as-input-to-classifiers
+    # https://github.com/fchollet/keras/issues/4838#issuecomment-326688772
+
+    @naisanza a one-hot encoding followed by a dense layer is the same as a single
+    embedding layer. Try both and you should get the same results with different
+    runtime. Do the linear algebra if you need to convince yourself.
+
+    The other big difference is lets say you have 256 categories. Each sample could
+    be one unsigned short (1 byte) or 256 floats (4*256 bytes). Passing data back and
+    forth to the CPU, the former should be much faster.
+
+    I try to never generate one-hot encodings on the CPU then send them to the GPU
+    because it feels like such a waste. However, it is a lot easier to understand,
+    so might be better for examples.
+
+    You can feed embeddings into an LSTM as well. That would be like having one-hot,
+    then dense, then LSTM, so one more layer than the current examples have.
+
+
+    left = Sequential()
+    left.add(Embedding(input_dim=csize, output_dim=rnn_size, input_length=q_seq_size, mask_zero=True))
+    left.add(LSTM(rnn_size))
+
+    right = Sequential()
+    right.add(Embedding(input_dim=csize, output_dim=rnn_size, input_length=t_seq_size, mask_zero=True))
+    right.add(LSTM(rnn_size))
+
+    merged = Sequential()
+    merged.add(Merge([left, right], mode='cos'))
+    merged.compile(optimizer='adam', loss='mse')
+
+
+
+    # https://www.quora.com/What-is-the-difference-between-using-word2vec-vs-one-hot-embeddings-as-input-to-classifiers
 
     1. One-hot vectors are high-dimensional and sparse, while word embeddings are
     low-dimensional and dense (they are usually between 50–600 dimensional). When
