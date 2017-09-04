@@ -8,6 +8,7 @@ http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-m
 # import keras
 from keras import callbacks
 from keras.models import Sequential
+from keras.layers import Embedding
 from keras.layers import LSTM
 from keras.layers import Dropout
 from keras.layers import Dense, Activation, Flatten
@@ -29,6 +30,65 @@ load_checkpoint = ''
 
 
 def char2vec(dataset):
+    """Convert dataset into an integer array for an Embedding layer
+
+    x: (samples, timesteps, features)
+    y: one hot encoding output
+
+    :param dataset:
+    :return: x, y, samples, timesteps, features, char_to_int, int_to_char
+    """
+
+    try:
+        raw_text = open(dataset, 'r').read().lower()
+        print('[*]', dataset)
+    except:
+        raise
+
+    chars = sorted(list(set(raw_text)))
+    char_to_int = dict((c, i) for i, c in enumerate(chars))
+    int_to_char = dict((i, c) for c, i in enumerate(chars))
+
+    nb_chars = raw_text.__len__()
+    features = chars.__len__()
+    timesteps = seq_length
+
+    # cut the text in semi-redundant sequences of seq_length
+
+    step = 3
+    X = []
+    Y = []
+    for i in range(0, nb_chars - seq_length, 1):
+        X.append(raw_text[i: i + seq_length])
+        Y.append(raw_text[i + seq_length])
+
+    samples = X.__len__()
+
+    print('[*] Corpus Length:', nb_chars)
+    print('[*] Features:', features)
+    print('[*] Samples:', samples)
+    print('[*] Timestep:', seq_length)
+
+    # https://github.com/minimaxir/char-embeddings/blob/master/text_generator_keras.py#L48
+    # x = np.zeros((len(sentences), maxlen), dtype=np.int)
+    # y = np.zeros((len(sentences), len(chars)), dtype=np.bool)
+    # for i, sentence in enumerate(sentences):
+    #     for t, char in enumerate(sentence):
+    #         X[i, t] = char_indices[char]
+    #     y[i, char_indices[next_chars[i]]] = 1
+
+    print('[*] Vectorization...')
+    x = np.zeros((samples, seq_length), dtype=np.int)
+    y = np.zeros((samples, features), dtype=np.bool)
+    for i, sentence in enumerate(X):
+        for t, char in enumerate(sentence):
+            x[i, t] = char_to_int[char]
+        y[i, char_to_int[Y[i]]] = 1
+
+    return x, y, samples, timesteps, features, char_to_int, int_to_char
+
+
+def char2vec_onehot(dataset):
     """Convert dataset into a one-hot encoded training data
 
     Total Vocab, is also the number of classes
@@ -37,7 +97,7 @@ def char2vec(dataset):
     y: one hot encoding
 
     :param dataset:
-    :return: x, y, n_chars, n_vocab, char_to_int, int_to_char
+    :return: x, y, samples, timesteps, features, output, char_to_int, int_to_char
     """
     try:
         raw_text = open(dataset, 'r').read().lower()
@@ -335,38 +395,27 @@ seq_length = 40        # input_length
 epochs = 1
 initial_epoch = 0
 
-x, y, samples, timesteps, features, output, char_to_int, int_to_char = char2vec(ds)
+x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec(ds)
 x_val, y_val = x, y
 
 model = Sequential()
 
-model.add(LSTM(128, input_shape=(timesteps, features)))  # (None, 100, 256)
-print(model.output_shape)
-
+model.add(Embedding(output_dim=128, input_dim=features, mask_zero=False))
+# model.add(LSTM(128, input_shape=(timesteps, features)))  # (None, 100, 256)
+model.add(LSTM(128))
 model.add(Dropout(0.5))     # (None, 256)
-print(model.output_shape)
-
 # model.add(LSTM(128, return_sequences=True))    # (None, 100, 256)
-# print(model.output_shape)
-#
 # model.add(Dropout(0.2))
-# print(model.output_shape)
-
 # model.add(Flatten())      # Flattens 3D -> 2D   # ValueError: Error when checking target: expected activation_1 to have 3 dimensions, but got array with shape (163717, 60)
-# print(model.output_shape)
-
-model.add(Dense(output))    # (None, 60)
-print(model.output_shape)
-
+model.add(Dense(features))    # (None, 60)
 model.add(Activation('relu'))   # (None, 60)
-print(model.output_shape)
-
-
-
 
 
 model.compile(loss='categorical_crossentropy',
               optimizer='adam', metrics=['accuracy'])
+
+print(model.summary())
+
 
 #############################################################################################
 
@@ -392,10 +441,3 @@ print('loss:', loss, 'acc:', acc)
 
 score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
 print(score, acc)
-
-
-
-
-
-
-
