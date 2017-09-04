@@ -425,19 +425,20 @@ if isfile(load_checkpoint):
     model.load_weights(load_checkpoint)
 
 
-# Updates happen after each batch
-history = model.fit(x, y,
-                    batch_size=batch_size,
-                    epochs=epochs,
-                    verbose=1,
-                    callbacks=callbacks_list,
-                    validation_data=(x_val, y_val),
-                    # validation_split=0.33
-                    shuffle=False,
-                    initial_epoch=initial_epoch)
+for i in range(0, 100):
+    # Updates happen after each batch
+    history = model.fit(x, y,
+                        batch_size=batch_size,
+                        epochs=epochs,
+                        verbose=1,
+                        callbacks=callbacks_list,
+                        validation_data=(x_val, y_val),
+                        # validation_split=0.33
+                        shuffle=False,
+                        initial_epoch=initial_epoch)
 
-loss, acc = history.history['loss'], history.history['acc']
-print('loss:', loss, 'acc:', acc)
+    loss, acc = history.history['loss'], history.history['acc']
+    print('loss:', loss, 'acc:', acc)
 
-score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
-print(score, acc)
+    # score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
+    # print('score:', score, 'accuracy:', acc)
