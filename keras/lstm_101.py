@@ -22,12 +22,11 @@ import numpy
 import numpy as np
 
 
-ds = '../dataset/training/wonderland.txt'
-t_ds = '../dataset/training/wonderland.txt'
+ds = 'dataset/training/wonderland.txt'
+t_ds = 'dataset/training/wonderland.txt'
 
-checkpoint = 'checkpoints/weights-improvement-{epoch:02d}-{loss:.4f}-{acc:.4f}.hdf5'
-load_checkpoint = ''
-
+checkpoint = 'keras/checkpoints/weights-improvement-{epoch:02d}-{loss:.4f}-{acc:.4f}.hdf5'
+load_checkpoint = 'keras/checkpoints/weights-improvement-04-3.0334-0.2770.hdf5'
 
 def char2vec(dataset):
     """Convert dataset into an integer array for an Embedding layer
@@ -365,13 +364,19 @@ def lstm_shape():
     """
 
 
-def dense_shape():
+def dense_layer():
     """
     A dense layer is 2D, comprised of:
         1. batch size
         2. input dimension
 
     Dense: 2D, input_shape=(batch_size, input_dim)
+    """
+
+
+def flatten_layer():
+    """
+    Flattens an input from 3D -> 3D
     """
 
 
@@ -391,22 +396,21 @@ callbacks_list = [
 #############################################################################################
 
 batch_size = 128
-seq_length = 40        # input_length
-epochs = 1
-initial_epoch = 0
+seq_length = 100        # input_length
+epochs = 1000000
+initial_epoch = 4
 
 x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec(ds)
 x_val, y_val = x, y
 
 model = Sequential()
 
-model.add(Embedding(output_dim=128, input_dim=features, mask_zero=False))
+model.add(Embedding(output_dim=64, input_dim=features, mask_zero=False))
 # model.add(LSTM(128, input_shape=(timesteps, features)))  # (None, 100, 256)
-model.add(LSTM(128))
-model.add(Dropout(0.5))     # (None, 256)
+model.add(LSTM(64))
+model.add(Dropout(0.2))
 # model.add(LSTM(128, return_sequences=True))    # (None, 100, 256)
 # model.add(Dropout(0.2))
-# model.add(Flatten())      # Flattens 3D -> 2D   # ValueError: Error when checking target: expected activation_1 to have 3 dimensions, but got array with shape (163717, 60)
 model.add(Dense(features))    # (None, 60)
 model.add(Activation('relu'))   # (None, 60)
 
@@ -423,22 +427,23 @@ print(model.summary())
 if isfile(load_checkpoint):
     print('[*] Checkpoint loaded', load_checkpoint)
     model.load_weights(load_checkpoint)
+else:
+    print('[*] No model loaded')
 
 
-for i in range(0, 100):
-    # Updates happen after each batch
-    history = model.fit(x, y,
-                        batch_size=batch_size,
-                        epochs=epochs,
-                        verbose=1,
-                        callbacks=callbacks_list,
-                        validation_data=(x_val, y_val),
-                        # validation_split=0.33
-                        shuffle=False,
-                        initial_epoch=initial_epoch)
+# Updates happen after each batch
+history = model.fit(x, y,
+                    batch_size=batch_size,
+                    epochs=epochs,
+                    verbose=1,
+                    callbacks=callbacks_list,
+                    validation_data=(x_val, y_val),
+                    # validation_split=0.33
+                    shuffle=False,
+                    initial_epoch=initial_epoch)
 
-    loss, acc = history.history['loss'], history.history['acc']
-    print('loss:', loss, 'acc:', acc)
+loss, acc = history.history['loss'], history.history['acc']
+print('loss:', loss, 'acc:', acc)
 
-    # score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
-    # print('score:', score, 'accuracy:', acc)
+# score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
+# print('score:', score, 'accuracy:', acc)
