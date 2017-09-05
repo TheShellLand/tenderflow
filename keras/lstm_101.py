@@ -22,17 +22,15 @@ import numpy
 import numpy as np
 
 
-ds = 'dataset/training/wonderland.txt'
-t_ds = 'dataset/training/wonderland.txt'
+ds = '../dataset/training/wonderland.txt'
+t_ds = '../dataset/training/wonderland.txt'
 
-checkpoint = 'keras/checkpoints/weights-improvement-{epoch:02d}-{loss:.4f}-{acc:.4f}.hdf5'
-load_checkpoint = 'keras/checkpoints/weights-improvement-04-3.0334-0.2770.hdf5'
 
 def char2vec(dataset):
     """Convert dataset into an integer array for an Embedding layer
 
-    x: (samples, timesteps, features)
-    y: one hot encoding output
+    x: Embedded array
+    y: one hot encoding array
 
     :param dataset:
     :return: x, y, samples, timesteps, features, char_to_int, int_to_char
@@ -46,7 +44,7 @@ def char2vec(dataset):
 
     chars = sorted(list(set(raw_text)))
     char_to_int = dict((c, i) for i, c in enumerate(chars))
-    int_to_char = dict((i, c) for c, i in enumerate(chars))
+    int_to_char = dict((i, c) for i, c in enumerate(chars))
 
     nb_chars = raw_text.__len__()
     features = chars.__len__()
@@ -57,16 +55,16 @@ def char2vec(dataset):
     step = 3
     X = []
     Y = []
-    for i in range(0, nb_chars - seq_length, 1):
+    for i in range(0, nb_chars - seq_length, step):
         X.append(raw_text[i: i + seq_length])
         Y.append(raw_text[i + seq_length])
 
     samples = X.__len__()
 
-    print('[*] Corpus Length:', nb_chars)
-    print('[*] Features:', features)
-    print('[*] Samples:', samples)
-    print('[*] Timestep:', seq_length)
+    print('[*] Corpus Length:', nb_chars)   # 163817
+    print('[*] Features:', features)        # 61
+    print('[*] Samples:', samples)          # 163761
+    print('[*] Timestep:', seq_length)      # 56
 
     # https://github.com/minimaxir/char-embeddings/blob/master/text_generator_keras.py#L48
     # x = np.zeros((len(sentences), maxlen), dtype=np.int)
@@ -169,7 +167,7 @@ def char2vec_onehot(dataset):
     # y = np_utils.to_categorical(y)
     output = y.shape[1]
 
-    return x, y, samples, timesteps, features, output, char_to_int, int_to_char
+    return x, y, samples, timesteps, features, char_to_int, int_to_char
 
 
 def word2vec(dataset):
@@ -381,6 +379,7 @@ def flatten_layer():
 
 
 # define the checkpoints
+checkpoint = 'checkpoints/weights-improvement-{epoch:02d}-{loss:.4f}-{acc:.4f}.hdf5'
 callbacks_list = [
     callbacks.ModelCheckpoint(checkpoint,
                               monitor='loss',
@@ -395,25 +394,31 @@ callbacks_list = [
 
 #############################################################################################
 
-batch_size = 128
-seq_length = 100        # input_length
+batch_size = 100
+seq_length = 56        # input_length
 epochs = 1000000
-initial_epoch = 4
+initial_epoch = 0
 
 x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec(ds)
+# x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec_onehot(ds)
 x_val, y_val = x, y
 
 model = Sequential()
 
-model.add(Embedding(output_dim=64, input_dim=features, mask_zero=False))
-# model.add(LSTM(128, input_shape=(timesteps, features)))  # (None, 100, 256)
+model.add(Embedding(output_dim=64, input_dim=features))
+model.add(Dropout(0.2))
+model.add(LSTM(128, return_sequences=True))
+model.add(Dropout(0.2))
 model.add(LSTM(64))
 model.add(Dropout(0.2))
-# model.add(LSTM(128, return_sequences=True))    # (None, 100, 256)
-# model.add(Dropout(0.2))
-model.add(Dense(features))    # (None, 60)
-model.add(Activation('relu'))   # (None, 60)
+model.add(Dense(features))
+model.add(Activation('relu'))
 
+# one-hot
+# model.add(LSTM(64, input_shape=(timesteps, features), return_sequences=False))
+# model.add(Dropout(0.2))     # (Srivastava, 2013)
+# model.add(Dense(features))
+# model.add(Activation('relu'))
 
 model.compile(loss='categorical_crossentropy',
               optimizer='adam', metrics=['accuracy'])
@@ -424,11 +429,18 @@ print(model.summary())
 #############################################################################################
 
 
+load_checkpoint = 'checkpoints/weights-improvement-27-2.3527-0.3627.hdf5'
+
 if isfile(load_checkpoint):
-    print('[*] Checkpoint loaded', load_checkpoint)
-    model.load_weights(load_checkpoint)
+    try:
+        model.load_weights(load_checkpoint)
+        print('[*] Checkpoint loaded', load_checkpoint)
+    except:
+        print('[*] Checkpoint load failed')
+        initial_epoch = 0
 else:
     print('[*] No model loaded')
+    initial_epoch = 0
 
 
 # Updates happen after each batch
@@ -437,13 +449,13 @@ history = model.fit(x, y,
                     epochs=epochs,
                     verbose=1,
                     callbacks=callbacks_list,
-                    validation_data=(x_val, y_val),
-                    # validation_split=0.33
+                    # validation_data=(x_val, y_val),
+                    # validation_split=0.33,
                     shuffle=False,
                     initial_epoch=initial_epoch)
 
-loss, acc = history.history['loss'], history.history['acc']
-print('loss:', loss, 'acc:', acc)
+# loss, acc = history.history['loss'], history.history['acc']
+# print('loss:', loss, 'acc:', acc)
 
 # score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
 # print('score:', score, 'accuracy:', acc)
