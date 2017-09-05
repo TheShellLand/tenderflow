@@ -1,0 +1,129 @@
+python3 lstm_101.py
+Using TensorFlow backend.
+[*] ../dataset/training/wonderland.txt
+[*] Corpus Length: 163817
+[*] Features: 61
+[*] Samples: 54587
+[*] Timestep: 56
+[*] Vectorization...
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+embedding_1 (Embedding)      (None, None, 64)          3904
+_________________________________________________________________
+dropout_1 (Dropout)          (None, None, 64)          0
+_________________________________________________________________
+lstm_1 (LSTM)                (None, None, 128)         98816
+_________________________________________________________________
+dropout_2 (Dropout)          (None, None, 128)         0
+_________________________________________________________________
+lstm_2 (LSTM)                (None, 128)               131584
+_________________________________________________________________
+dropout_3 (Dropout)          (None, 128)               0
+_________________________________________________________________
+dense_1 (Dense)              (None, 61)                7869
+_________________________________________________________________
+activation_1 (Activation)    (None, 61)                0
+=================================================================
+Total params: 242,173
+Trainable params: 242,173
+Non-trainable params: 0
+_________________________________________________________________
+None
+[*] Checkpoint load failed
+Epoch 1/1000000
+2017-09-05 04:38:25.366376: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2017-09-05 04:38:25.366401: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+2017-09-05 04:38:25.637740: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:893] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2017-09-05 04:38:25.638010: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
+name: GeForce GTX 780
+major: 3 minor: 5 memoryClockRate (GHz) 1.0195
+pciBusID 0000:05:00.0
+Total memory: 2.95GiB
+Free memory: 1.88GiB
+2017-09-05 04:38:25.638033: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0
+2017-09-05 04:38:25.638041: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y
+2017-09-05 04:38:25.638050: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -> (device: 0, name: GeForce GTX 780, pci bus id: 0000:05:00.0)
+16800/54587 [========>.....................] - ETA: 85s - loss: 4.6061 - acc: 0.15232017-09-05 04:39:03.392522: E tensorflow/stream_executor/cuda/cuda_blas.cc:551] failed to run cuBLAS routine cublasSgemm_v2: CUBLAS_STATUS_EXECUTION_FAILED
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/client/session.py", line 1327, in _do_call
+    return fn(*args)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/client/session.py", line 1306, in _run_fn
+    status, run_metadata)
+  File "/usr/lib/python3.5/contextlib.py", line 66, in __exit__
+    next(self.gen)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/framework/errors_impl.py", line 466, in raise_exception_on_not_ok_status
+    pywrap_tensorflow.TF_GetCode(status))
+tensorflow.python.framework.errors_impl.InternalError: Blas GEMM launch failed : a.shape=(100, 128), b.shape=(128, 128), m=100, n=128, k=128
+         [[Node: lstm_2/while/MatMul = MatMul[T=DT_FLOAT, transpose_a=false, transpose_b=false, _device="/job:localhost/replica:0/task:0/gpu:0"](lstm_2/while/mul, lstm_2/while/MatMul/Enter)]]
+         [[Node: metrics/acc/Mean/_53 = _Recv[client_terminated=false, recv_device="/job:localhost/replica:0/task:0/cpu:0", send_device="/job:localhost/replica:0/task:0/gpu:0", send_device_incarnation=1, tensor_name="edge_4791_metrics/acc/Mean", tensor_type=DT_FLOAT, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "lstm_101.py", line 454, in <module>
+    initial_epoch=initial_epoch)
+  File "/usr/local/lib/python3.5/dist-packages/keras/models.py", line 867, in fit
+    initial_epoch=initial_epoch)
+  File "/usr/local/lib/python3.5/dist-packages/keras/engine/training.py", line 1598, in fit
+    validation_steps=validation_steps)
+  File "/usr/local/lib/python3.5/dist-packages/keras/engine/training.py", line 1183, in _fit_loop
+    outs = f(ins_batch)
+  File "/usr/local/lib/python3.5/dist-packages/keras/backend/tensorflow_backend.py", line 2273, in __call__
+    **self.session_kwargs)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/client/session.py", line 895, in run
+    run_metadata_ptr)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/client/session.py", line 1124, in _run
+    feed_dict_tensor, options, run_metadata)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/client/session.py", line 1321, in _do_run
+    options, run_metadata)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/client/session.py", line 1340, in _do_call
+    raise type(e)(node_def, op, message)
+tensorflow.python.framework.errors_impl.InternalError: Blas GEMM launch failed : a.shape=(100, 128), b.shape=(128, 128), m=100, n=128, k=128
+         [[Node: lstm_2/while/MatMul = MatMul[T=DT_FLOAT, transpose_a=false, transpose_b=false, _device="/job:localhost/replica:0/task:0/gpu:0"](lstm_2/while/mul, lstm_2/while/MatMul/Enter)]]
+         [[Node: metrics/acc/Mean/_53 = _Recv[client_terminated=false, recv_device="/job:localhost/replica:0/task:0/cpu:0", send_device="/job:localhost/replica:0/task:0/gpu:0", send_device_incarnation=1, tensor_name="edge_4791_metrics/acc/Mean", tensor_type=DT_FLOAT, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
+
+Caused by op 'lstm_2/while/MatMul', defined at:
+  File "lstm_101.py", line 412, in <module>
+    model.add(LSTM(128))
+  File "/usr/local/lib/python3.5/dist-packages/keras/models.py", line 475, in add
+    output_tensor = layer(self.outputs[0])
+  File "/usr/local/lib/python3.5/dist-packages/keras/layers/recurrent.py", line 268, in __call__
+    return super(Recurrent, self).__call__(inputs, **kwargs)
+  File "/usr/local/lib/python3.5/dist-packages/keras/engine/topology.py", line 602, in __call__
+    output = self.call(inputs, **kwargs)
+  File "/usr/local/lib/python3.5/dist-packages/keras/layers/recurrent.py", line 348, in call
+    input_length=timesteps)
+  File "/usr/local/lib/python3.5/dist-packages/keras/backend/tensorflow_backend.py", line 2546, in rnn
+    swap_memory=True)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/ops/control_flow_ops.py", line 2775, in while_loop
+    result = context.BuildLoop(cond, body, loop_vars, shape_invariants)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/ops/control_flow_ops.py", line 2604, in BuildLoop
+    pred, body, original_loop_vars, loop_vars, shape_invariants)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/ops/control_flow_ops.py", line 2554, in _BuildLoop
+    body_result = body(*packed_vars_for_body)
+  File "/usr/local/lib/python3.5/dist-packages/keras/backend/tensorflow_backend.py", line 2535, in _step
+    tuple(constants))
+  File "/usr/local/lib/python3.5/dist-packages/keras/layers/recurrent.py", line 1166, in step
+    self.recurrent_kernel_i))
+  File "/usr/local/lib/python3.5/dist-packages/keras/backend/tensorflow_backend.py", line 998, in dot
+    out = tf.matmul(x, y)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/ops/math_ops.py", line 1844, in matmul
+    a, b, transpose_a=transpose_a, transpose_b=transpose_b, name=name)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/ops/gen_math_ops.py", line 1289, in _mat_mul
+    transpose_b=transpose_b, name=name)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/framework/op_def_library.py", line 767, in apply_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/framework/ops.py", line 2630, in create_op
+    original_op=self._default_original_op, op_def=op_def)
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/framework/ops.py", line 1204, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+InternalError (see above for traceback): Blas GEMM launch failed : a.shape=(100, 128), b.shape=(128, 128), m=100, n=128, k=128
+         [[Node: lstm_2/while/MatMul = MatMul[T=DT_FLOAT, transpose_a=false, transpose_b=false, _device="/job:localhost/replica:0/task:0/gpu:0"](lstm_2/while/mul, lstm_2/while/MatMul/Enter)]]
+         [[Node: metrics/acc/Mean/_53 = _Recv[client_terminated=false, recv_device="/job:localhost/replica:0/task:0/cpu:0", send_device="/job:localhost/replica:0/task:0/gpu:0", send_device_incarnation=1, tensor_name="edge_4791_metrics/acc/Mean", tensor_type=DT_FLOAT, _device="/job:localhost/replica:0/task:0/cpu:0"]()]]
+
+Exception ignored in: <bound method BaseSession.__del__ of <tensorflow.python.client.session.Session object at 0x7f0890064a20>>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/client/session.py", line 701, in __del__
+TypeError: 'NoneType' object is not callable
