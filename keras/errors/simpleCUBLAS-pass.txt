@@ -1,0 +1,5 @@
+#/usr/local/cuda-8.0/samples/7_CUDALibraries/simpleCUBLAS$ ./simpleCUBLAS
+GPU Device 0: "GeForce GTX 780" with compute capability 3.5
+
+simpleCUBLAS test running..
+simpleCUBLAS test passed.
