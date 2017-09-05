@@ -75,7 +75,7 @@ def char2vec(dataset):
     #     y[i, char_indices[next_chars[i]]] = 1
 
     print('[*] Vectorization...')
-    x = np.zeros((samples, seq_length), dtype=np.int)
+    x = np.zeros((samples, seq_length), dtype=np.int32)
     y = np.zeros((samples, features), dtype=np.bool)
     for i, sentence in enumerate(X):
         for t, char in enumerate(sentence):
@@ -397,7 +397,7 @@ callbacks_list = [
 batch_size = 100
 seq_length = 56        # input_length
 epochs = 1000000
-initial_epoch = 0
+initial_epoch = 17
 
 x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec(ds)
 # x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec_onehot(ds)
@@ -429,7 +429,7 @@ print(model.summary())
 #############################################################################################
 
 
-load_checkpoint = 'checkpoints/weights-improvement-27-2.3527-0.3627.hdf5'
+load_checkpoint = 'checkpoints/weights-improvement-17-2.9099-0.2565.hdf5'
 
 if isfile(load_checkpoint):
     try:
