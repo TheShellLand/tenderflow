@@ -45,8 +45,8 @@ if [ "$1" == "--gpu" ]; then
     # cuDNN 6
     dpkg -i libcudnn6_6.0.21-1+cuda8.0_amd64.deb
     dpkg -i libcudnn6-dev_6.0.21-1+cuda8.0_amd64.deb
-    cp -P cuda/include/cudnn.h /usr/local/cuda-8.0/include/
-    cp -P cuda/lib64/libcudnn* /usr/local/cuda-8.0/lib64/
+    cp -vP cuda/include/cudnn.h /usr/local/cuda/include/
+    cp -vP cuda/lib64/libcudnn*  /usr/local/cuda/lib64/
 #    tar zxf processed-cudnn-8.0-linux-x64-v6.tgz -C /
 
     # cuDNN 7
