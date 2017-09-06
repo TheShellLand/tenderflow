@@ -1,0 +1,179 @@
+python3 lstm_101.py
+Using TensorFlow backend.
+[*] ../dataset/training/wonderland.txt
+[*] Corpus Length: 163817
+[*] Features: 61
+[*] Samples: 54587
+[*] Timestep: 56
+[*] Vectorization...
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+embedding_1 (Embedding)      (None, None, 64)          3904
+_________________________________________________________________
+dropout_1 (Dropout)          (None, None, 64)          0
+_________________________________________________________________
+lstm_1 (LSTM)                (None, None, 128)         98816
+_________________________________________________________________
+dropout_2 (Dropout)          (None, None, 128)         0
+_________________________________________________________________
+lstm_2 (LSTM)                (None, 64)                49408
+_________________________________________________________________
+dropout_3 (Dropout)          (None, 64)                0
+_________________________________________________________________
+dense_1 (Dense)              (None, 61)                3965
+_________________________________________________________________
+activation_1 (Activation)    (None, 61)                0
+=================================================================
+Total params: 156,093
+Trainable params: 156,093
+Non-trainable params: 0
+_________________________________________________________________
+None
+[*] No model loaded
+Epoch 1/1000000
+2017-09-06 08:13:04.710171: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2017-09-06 08:13:04.710198: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+2017-09-06 08:13:04.994884: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:893] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2017-09-06 08:13:04.995150: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
+name: GeForce GTX 780
+major: 3 minor: 5 memoryClockRate (GHz) 1.0195
+pciBusID 0000:05:00.0
+Total memory: 2.95GiB
+Free memory: 1.92GiB
+2017-09-06 08:13:04.995173: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0
+2017-09-06 08:13:04.995181: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y
+2017-09-06 08:13:04.995190: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -> (device: 0, name: GeForce GTX 780, pci bus id: 0000:05:00.0)
+54500/54587 [============================>.] - ETA: 0s - loss: 3.7856 - acc: 0.1673Epoch 00000: loss improved from inf to 3.78422, saving model 54587/54587 [==============================] - 123s - loss: 3.7842 - acc: 0.1674
+Epoch 2/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.3441 - acc: 0.1715Epoch 00001: loss improved from 3.78422 to 3.34352, saving mo54587/54587 [==============================] - 123s - loss: 3.3435 - acc: 0.1716
+Epoch 3/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.3104 - acc: 0.1715Epoch 00002: loss improved from 3.34352 to 3.30979, saving mo54587/54587 [==============================] - 121s - loss: 3.3098 - acc: 0.1716
+Epoch 4/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.3070 - acc: 0.1715Epoch 00003: loss improved from 3.30979 to 3.30650, saving mo54587/54587 [==============================] - 121s - loss: 3.3065 - acc: 0.1716
+Epoch 5/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.3023 - acc: 0.1715Epoch 00004: loss improved from 3.30650 to 3.30179, saving mo54587/54587 [==============================] - 121s - loss: 3.3018 - acc: 0.1716
+Epoch 6/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.2985 - acc: 0.1715Epoch 00005: loss improved from 3.30179 to 3.29798, saving mo54587/54587 [==============================] - 121s - loss: 3.2980 - acc: 0.1716
+Epoch 7/1000000
+54587/54587 [==============================] - 120s - loss: 3.2986 - acc: 0.1716   Epoch 00006: loss did not improve
+Epoch 8/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.2949 - acc: 0.1715Epoch 00007: loss improved from 3.29798 to 3.29439, saving mo54587/54587 [==============================] - 121s - loss: 3.2944 - acc: 0.1716
+Epoch 9/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.2913 - acc: 0.1715Epoch 00008: loss improved from 3.29439 to 3.29075, saving mo54587/54587 [==============================] - 120s - loss: 3.2908 - acc: 0.1716
+Epoch 10/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.2649 - acc: 0.1715Epoch 00009: loss improved from 3.29075 to 3.26441, saving mo54587/54587 [==============================] - 124s - loss: 3.2644 - acc: 0.1716
+Epoch 11/1000000
+54500/54587 [============================>.] - ETA: 0s - loss: 3.1571 - acc: 0.1783Epoch 00010: loss improved from 3.26441 to 3.15648, saving mo54587/54587 [==============================] - 126s - loss: 3.1565 - acc: 0.1784
+Epoch 12/1000000
+11600/54587 [=====>........................] - ETA: 100s - loss: 3.0579 - acc: 0.20752017-09-06 08:35:57.684610: E tensorflow/stream_executor/cuda/cuda_blas.cc:551] failed to run cuBLAS routine cublasSgemm_v2: CUBLAS_STATUS_EXECUTION_FAILED
+Traceback (most recent call last):
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1327, in _do_call
+    return fn(*args)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1306, in _run_fn
+    status, run_metadata)
+  File "/usr/lib/python3.5/contextlib.py", line 66, in __exit__
+    next(self.gen)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/framework/errors_impl.py", line 466, in raise_exception_on_not_ok_status
+    pywrap_tensorflow.TF_GetCode(status))
+tensorflow.python.framework.errors_impl.InternalError: Blas GEMM launch failed : a.shape=(100, 128), b.shape=(128, 128), m=100, n=128, k=128
+         [[Node: training/Adam/gradients/lstm_1/while/MatMul_3_grad/MatMul = MatMul[T=DT_FLOAT, _class=["loc:@lstm_1/while/MatMul_3"], transpose_a=false, transpose_b=true, _device="/job:localhost/replica:0/task:0/gpu:0"](training/Adam/gradients/lstm_1/while/add_6_grad/Reshape_1, training/Adam/gradients/lstm_1/while/MatMul_3_grad/MatMul/Enter)]]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "lstm_101.py", line 455, in <module>
+    initial_epoch=initial_epoch)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/models.py", line 867, in fit
+    initial_epoch=initial_epoch)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/engine/training.py", line 1598, in fit
+    validation_steps=validation_steps)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/engine/training.py", line 1183, in _fit_loop
+    outs = f(ins_batch)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/backend/tensorflow_backend.py", line 2273, in __call__
+    **self.session_kwargs)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 895, in run
+    run_metadata_ptr)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1124, in _run
+    feed_dict_tensor, options, run_metadata)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1321, in _do_run
+    options, run_metadata)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1340, in _do_call
+    raise type(e)(node_def, op, message)
+tensorflow.python.framework.errors_impl.InternalError: Blas GEMM launch failed : a.shape=(100, 128), b.shape=(128, 128), m=100, n=128, k=128
+         [[Node: training/Adam/gradients/lstm_1/while/MatMul_3_grad/MatMul = MatMul[T=DT_FLOAT, _class=["loc:@lstm_1/while/MatMul_3"], transpose_a=false, transpose_b=true, _device="/job:localhost/replica:0/task:0/gpu:0"](training/Adam/gradients/lstm_1/while/add_6_grad/Reshape_1, training/Adam/gradients/lstm_1/while/MatMul_3_grad/MatMul/Enter)]]
+
+Caused by op 'training/Adam/gradients/lstm_1/while/MatMul_3_grad/MatMul', defined at:
+  File "lstm_101.py", line 455, in <module>
+    initial_epoch=initial_epoch)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/models.py", line 867, in fit
+    initial_epoch=initial_epoch)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/engine/training.py", line 1575, in fit
+    self._make_train_function()
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/engine/training.py", line 960, in _make_train_function
+    loss=self.total_loss)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/legacy/interfaces.py", line 87, in wrapper
+    return func(*args, **kwargs)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/optimizers.py", line 415, in get_updates
+    grads = self.get_gradients(loss, params)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/optimizers.py", line 73, in get_gradients
+    grads = K.gradients(loss, params)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/backend/tensorflow_backend.py", line 2310, in gradients
+    return tf.gradients(loss, variables, colocate_gradients_with_ops=True)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/gradients_impl.py", line 542, in gradients
+    grad_scope, op, func_call, lambda: grad_fn(op, *out_grads))
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/gradients_impl.py", line 348, in _MaybeCompile
+    return grad_fn()  # Exit early
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/gradients_impl.py", line 542, in <lambda>
+    grad_scope, op, func_call, lambda: grad_fn(op, *out_grads))
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/math_grad.py", line 874, in _MatMulGrad
+    grad_a = math_ops.matmul(grad, b, transpose_b=True)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/math_ops.py", line 1844, in matmul
+    a, b, transpose_a=transpose_a, transpose_b=transpose_b, name=name)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/gen_math_ops.py", line 1289, in _mat_mul
+    transpose_b=transpose_b, name=name)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/framework/op_def_library.py", line 767, in apply_op
+    op_def=op_def)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/framework/ops.py", line 2630, in create_op
+    original_op=self._default_original_op, op_def=op_def)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/framework/ops.py", line 1204, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+...which was originally created as op 'lstm_1/while/MatMul_3', defined at:
+  File "lstm_101.py", line 410, in <module>
+    model.add(LSTM(128, return_sequences=True))
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/models.py", line 475, in add
+    output_tensor = layer(self.outputs[0])
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/layers/recurrent.py", line 268, in __call__
+    return super(Recurrent, self).__call__(inputs, **kwargs)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/engine/topology.py", line 602, in __call__
+    output = self.call(inputs, **kwargs)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/layers/recurrent.py", line 348, in call
+    input_length=timesteps)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/backend/tensorflow_backend.py", line 2546, in rnn
+    swap_memory=True)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2775, in while_loop
+    result = context.BuildLoop(cond, body, loop_vars, shape_invariants)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2604, in BuildLoop
+    pred, body, original_loop_vars, loop_vars, shape_invariants)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2554, in _BuildLoop
+    body_result = body(*packed_vars_for_body)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/backend/tensorflow_backend.py", line 2535, in _step
+    tuple(constants))
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/layers/recurrent.py", line 1172, in step
+    self.recurrent_kernel_o))
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/keras/backend/tensorflow_backend.py", line 998, in dot
+    out = tf.matmul(x, y)
+  File "/home/eric/.venv/tenderflow/lib/python3.5/site-packages/tensorflow/python/ops/math_ops.py", line 1844, in matmul
+    a, b, transpose_a=transpose_a, transpose_b=transpose_b, name=name)
+
+InternalError (see above for traceback): Blas GEMM launch failed : a.shape=(100, 128), b.shape=(128, 128), m=100, n=128, k=128
+         [[Node: training/Adam/gradients/lstm_1/while/MatMul_3_grad/MatMul = MatMul[T=DT_FLOAT, _class=["loc:@lstm_1/while/MatMul_3"], transpose_a=false, transpose_b=true, _device="/job:localhost/replica:0/task:0/gpu:0"](training/Adam/gradients/lstm_1/while/add_6_grad/Reshape_1, training/Adam/gradients/lstm_1/while/MatMul_3_grad/MatMul/Enter)]]
+
+2017-09-06 08:35:57.883794: E tensorflow/stream_executor/event.cc:33] error destroying CUDA event in context 0x4781ab0: CUDA_ERROR_ILLEGAL_ADDRESS
+2017-09-06 08:35:57.883850: E tensorflow/stream_executor/event.cc:33] error destroying CUDA event in context 0x4781ab0: CUDA_ERROR_ILLEGAL_ADDRESS
+2017-09-06 08:35:57.884179: E tensorflow/stream_executor/event.cc:33] error destroying CUDA event in context 0x4781ab0: CUDA_ERROR_ILLEGAL_ADDRESS
+2017-09-06 08:35:57.884562: E tensorflow/stream_executor/event.cc:33] error destroying CUDA event in context 0x4781ab0: CUDA_ERROR_ILLEGAL_ADDRESS
+2017-09-06 08:35:57.885071: E tensorflow/stream_executor/event.cc:33] error destroying CUDA event in context 0x4781ab0: CUDA_ERROR_ILLEGAL_ADDRESS
+2017-09-06 08:35:57.885158: E tensorflow/stream_executor/event.cc:33] error destroying CUDA event in context 0x4781ab0: CUDA_ERROR_ILLEGAL_ADDRESS
+2017-09-06 08:35:57.885243: E tensorflow/stream_executor/event.cc:33] error destroying CUDA event in context 0x4781ab0: CUDA_ERROR_ILLEGAL_ADDRESS
