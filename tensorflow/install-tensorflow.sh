@@ -10,7 +10,6 @@ if [ "$1" == "--remove" ]; then
     pip3 uninstall -y tensorflow-gpu
     pip3 uninstall -y keras
     pip3 uninstall -y h5py
-    rm -r /usr/local/cuda
     rm -r /usr/local/cuda-8.0
     exit 0
 fi
