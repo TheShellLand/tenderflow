@@ -8,6 +8,7 @@ if [ "$1" == "--remove" ]; then
     apt purge -y libcuda*
     pip3 uninstall -y tensorflow
     pip3 uninstall -y tensorflow-gpu
+    pip3 uninstall -y tensorboard
     pip3 uninstall -y keras
     pip3 uninstall -y h5py
     rm -r /usr/local/cuda-8.0
@@ -27,6 +28,7 @@ pip3 install --upgrade pip
 # source $venv/bin/activate
 # Tensorflow CPU-only
 pip3 install --upgrade tensorflow
+pip3 install --upgrade tensorboard
 # Tensorflow + GPU
 if [ "$1" == "--gpu" ]; then
     # http://us.download.nvidia.com/XFree86/Linux-x86_64/384.59/NVIDIA-Linux-x86_64-384.59.run
