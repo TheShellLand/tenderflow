@@ -5,8 +5,11 @@ http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-m
 """
 
 
-# import keras
+import keras
 from keras import callbacks
+from keras.models import Model
+from keras.layers import Input
+from keras.layers import concatenate
 from keras.models import Sequential
 from keras.layers import Embedding
 from keras.layers import LSTM
@@ -15,6 +18,7 @@ from keras.layers import Dense, Activation, Flatten
 from keras.utils import np_utils
 from keras.preprocessing.sequence import pad_sequences
 
+from time import sleep
 from os import listdir
 from os.path import isfile, join
 
@@ -24,6 +28,8 @@ import numpy as np
 
 ds = '../dataset/training/wonderland.txt'
 t_ds = '../dataset/training/wonderland.txt'
+
+modelName = 'Embedding +2LSTM +activation'
 
 
 def char2vec(dataset):
@@ -381,11 +387,14 @@ def flatten_layer():
 # define the checkpoints
 checkpoint = 'checkpoints/weights-improvement-{epoch:02d}-{loss:.4f}-{acc:.4f}.hdf5'
 callbacks_list = [
+    callbacks.TensorBoard(log_dir='logs/Graph/' + modelName,
+                          write_graph=True,
+                          write_images=True),
     callbacks.ModelCheckpoint(checkpoint,
                               monitor='loss',
                               verbose=1,
                               save_best_only=True),
-    callbacks.TerminateOnNaN()
+    # callbacks.TerminateOnNaN()
 ]
 
 
@@ -395,53 +404,142 @@ callbacks_list = [
 #############################################################################################
 
 batch_size = 100
-seq_length = 56        # input_length
+seq_length = 100        # input_length
 epochs = 1000000
-initial_epoch = 17
+initial_epoch = 29
 
 x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec(ds)
 # x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec_onehot(ds)
 x_val, y_val = x, y
 
-model = Sequential()
 
-model.add(Embedding(output_dim=64, input_dim=features))
-model.add(Dropout(0.2))
-model.add(LSTM(128, return_sequences=True))
-model.add(Dropout(0.2))
-model.add(LSTM(64))
-model.add(Dropout(0.2))
-model.add(Dense(features))
-model.add(Activation('relu'))
-
-# one-hot
-# model.add(LSTM(64, input_shape=(timesteps, features), return_sequences=False))
-# model.add(Dropout(0.2))     # (Srivastava, 2013)
+# Embedding (316s)
+# model = Sequential()
+# model.add(Embedding(output_dim=128, input_dim=features))
+# model.add(Dropout(0.2))
+# model.add(LSTM(128, return_sequences=True))
+# model.add(Dropout(0.2))
+# model.add(LSTM(features))
+# model.add(Dropout(0.2))
 # model.add(Dense(features))
 # model.add(Activation('relu'))
 
-model.compile(loss='categorical_crossentropy',
-              optimizer='adam', metrics=['accuracy'])
+# Embedding using Model API #1 (+2LSTM +activation +dropout)
+inputs = Input(shape=(timesteps,), name='corpus')
+l = Embedding(output_dim=timesteps, input_dim=features)(inputs)
+l = Dropout(0.2)(l)
+l = LSTM(64, return_sequences=True)(l)
+l = Activation('relu')(l)
+l = Dropout(0.2)(l)
+l = LSTM(64)(l)
+l = Activation('relu')(l)
+l = Dropout(0.2)(l)
+o = Dense(features)(l)
+o = Activation('softmax')(o)
+output = o
+model = Model(inputs=inputs, outputs=output)
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+initial_epoch = 465
+load_checkpoint = 'checkpoints/'
+
+# Embedding using Model API #1 (+1LSTM)
+# inputs = Input(shape=(timesteps,), name='corpus')
+# l = Embedding(output_dim=timesteps, input_dim=features)(inputs)
+# l = Dropout(0.2)(l)
+# l = LSTM(64, return_sequences=False)(l)
+# l = Activation('relu')(l)
+# l = Dropout(0.2)(l)
+# o = Dense(features)(l)
+# o = Activation('softmax')(o)
+# output = o
+# model = Model(inputs=inputs, outputs=output)
+# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+# initial_epoch = 465
+# load_checkpoint = 'checkpoints/Model Embedding +1LSTM-464-1.5295-0.5324.hdf5'
+
+# Embedding using Model API #2 (without activation)
+# inputs = Input(shape=(timesteps,), name='Embeddding-no-activation')
+# l = Embedding(output_dim=timesteps, input_dim=features)(inputs)
+# l = Dropout(0.2)(l)
+# l = LSTM(64, return_sequences=True)(l)
+# l = Dropout(0.2)(l)
+# l = LSTM(64)(l)
+# l = Dropout(0.2)(l)
+# o = Dense(features)(l)
+# o = Activation('softmax')(o)
+# output = o
+# model = Model(inputs=inputs, outputs=output)
+# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+# initial_epoch = 54
+# load_checkpoint = 'checkpoints/'
+
+# one-hot
+# model = Sequential()
+# model.add(LSTM(features, input_shape=(timesteps, features), return_sequences=False))
+# model.add(Dropout(0.2))     # (Srivastava, 2013)
+# model.add(LSTM(32))
+# model.add(Dropout(0.2))
+# model.add(Dense(features))
+# model.add(Activation('relu'))
+
+# onehotModel-108-2.3848-0.3458.hdf5
+# batch_size = 200
+# seq_length = 100        # input_length
+# one-hot using Model API (150s)
+# inputs = Input(shape=(timesteps, features), name='book')
+# book = Dropout(0.2)(inputs)
+# book = LSTM(features)(book)
+# book = Dropout(0.2)(book)
+# output = Dense(features)(book)
+# output = Activation('relu')(output)
+# model = Model(inputs=inputs, outputs=output)
+# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 print(model.summary())
+
+
+def build_model(dataLength, labelLength):
+
+    layer_1 = Input(shape=(dataLength, 1), name='layer_1')
+    layer_2 = Input(shape=(dataLength, 1), name='layer_2')
+
+    layer_1 = LSTM(64, return_sequences=False)(layer_1)
+    layer_2 = LSTM(64, return_sequences=False)(layer_2)
+
+    output = concatenate(
+        [layer_1,
+         layer_2]
+    )
+    output = Dense(labelLength, activation='relu', name='output')(output)
+
+    model = Model(
+        inputs=[layer_1, layer_2],
+        outputs=[output]
+    )
+
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam', metrics=['accuracy'])
+    return model
+
 
 
 #############################################################################################
 
 
-load_checkpoint = 'checkpoints/weights-improvement-17-2.9099-0.2565.hdf5'
+# load_checkpoint = 'checkpoints/'
 
 if isfile(load_checkpoint):
     try:
         model.load_weights(load_checkpoint)
         print('[*] Checkpoint loaded', load_checkpoint)
-    except:
-        print('[*] Checkpoint load failed')
+    except Exception as err:
+        print('[*] Checkpoint load failed:', err)
         initial_epoch = 0
 else:
     print('[*] No model loaded')
     initial_epoch = 0
 
+sleep(5)
 
 # Updates happen after each batch
 history = model.fit(x, y,
@@ -459,3 +557,6 @@ history = model.fit(x, y,
 
 # score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
 # print('score:', score, 'accuracy:', acc)
+
+prediction = model.predict()
+print(prediction)
