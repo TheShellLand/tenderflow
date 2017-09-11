@@ -29,7 +29,7 @@ import numpy as np
 ds = '../dataset/training/wonderland.txt'
 t_ds = '../dataset/training/wonderland.txt'
 
-modelName = 'Embedding +2LSTM +activation'
+modelName = 'Embedding +64E +128LSTM +128LSTM +activation +dropout'
 
 
 def char2vec(dataset):
@@ -39,7 +39,7 @@ def char2vec(dataset):
     y: one hot encoding array
 
     :param dataset:
-    :return: x, y, samples, timesteps, features, char_to_int, int_to_char
+    :return: x, y, samples, timestep, features, char_to_int, int_to_char
     """
 
     try:
@@ -54,7 +54,7 @@ def char2vec(dataset):
 
     nb_chars = raw_text.__len__()
     features = chars.__len__()
-    timesteps = seq_length
+    timestep = seq_length
 
     # cut the text in semi-redundant sequences of seq_length
 
@@ -88,7 +88,7 @@ def char2vec(dataset):
             x[i, t] = char_to_int[char]
         y[i, char_to_int[Y[i]]] = 1
 
-    return x, y, samples, timesteps, features, char_to_int, int_to_char
+    return x, y, samples, timestep, features, char_to_int, int_to_char
 
 
 def char2vec_onehot(dataset):
@@ -406,9 +406,9 @@ callbacks_list = [
 batch_size = 100
 seq_length = 100        # input_length
 epochs = 1000000
-initial_epoch = 29
+initial_epoch = 0
 
-x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec(ds)
+x, y, samples, timestep, features, char_to_int, int_to_char = char2vec(ds)
 # x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec_onehot(ds)
 x_val, y_val = x, y
 
@@ -424,14 +424,14 @@ x_val, y_val = x, y
 # model.add(Dense(features))
 # model.add(Activation('relu'))
 
-# Embedding using Model API #1 (+2LSTM +activation +dropout)
-inputs = Input(shape=(timesteps,), name='corpus')
-l = Embedding(output_dim=timesteps, input_dim=features)(inputs)
+# Embedding using Model (+64Embedding +128LSTM +128LSTM +activation +dropout)
+inputs = Input(shape=(timestep,), name='corpus')
+l = Embedding(output_dim=64, input_dim=features, input_length=seq_length)(inputs)
 l = Dropout(0.2)(l)
-l = LSTM(64, return_sequences=True)(l)
+l = LSTM(128, return_sequences=True)(l)
 l = Activation('relu')(l)
 l = Dropout(0.2)(l)
-l = LSTM(64)(l)
+l = LSTM(128)(l)
 l = Activation('relu')(l)
 l = Dropout(0.2)(l)
 o = Dense(features)(l)
@@ -439,10 +439,48 @@ o = Activation('softmax')(o)
 output = o
 model = Model(inputs=inputs, outputs=output)
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-initial_epoch = 465
+initial_epoch = 0
 load_checkpoint = 'checkpoints/'
 
-# Embedding using Model API #1 (+1LSTM)
+# Embedding using Model (+64Embedding +64LSTM +128LSTM +activation +dropout)
+# inputs = Input(shape=(timestep,), name='corpus')
+# l = Embedding(output_dim=64, input_dim=features, input_length=seq_length)(inputs)
+# l = Dropout(0.2)(l)
+# l = LSTM(64, return_sequences=True)(l)
+# l = Activation('relu')(l)
+# l = Dropout(0.2)(l)
+# l = LSTM(128)(l)
+# l = Activation('relu')(l)
+# l = Dropout(0.2)(l)
+# o = Dense(features)(l)
+# o = Activation('softmax')(o)
+# output = o
+# model = Model(inputs=inputs, outputs=output)
+# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+# initial_epoch = 0
+# load_checkpoint = 'checkpoints/Embedding +64E +64LSTM +128LSTM +activation +dropout-187-1.3280-0.5864.hdf5'
+
+# Embedding using Model (+64Embedding +64LSTM +64LSTM +activation +dropout) (197s)
+# inputs = Input(shape=(timestep,), name='corpus')
+# l = Embedding(output_dim=64, input_dim=features, input_length=seq_length)(inputs)
+# l = Dropout(0.2)(l)
+# l = LSTM(64, return_sequences=True)(l)
+# l = Activation('relu')(l)
+# l = Dropout(0.2)(l)
+# l = LSTM(64)(l)
+# l = Activation('relu')(l)
+# l = Dropout(0.2)(l)
+# o = Dense(features)(l)
+# o = Activation('softmax')(o)
+# output = o
+# model = Model(inputs=inputs, outputs=output)
+# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+# initial_epoch = 65
+# load_checkpoint = 'checkpoints/Embedding +64E +64LSTM +64LSTM +activation +dropout-66-1.8471-0.4574.hdf5'
+# initial_epoch = 465
+# load_checkpoint = 'checkpoints/Embedding +2LSTM +activation +dropout-138-1.6984-0.4886.hdf5'
+
+# Embedding using Model (+1LSTM)
 # inputs = Input(shape=(timesteps,), name='corpus')
 # l = Embedding(output_dim=timesteps, input_dim=features)(inputs)
 # l = Dropout(0.2)(l)
@@ -457,7 +495,7 @@ load_checkpoint = 'checkpoints/'
 # initial_epoch = 465
 # load_checkpoint = 'checkpoints/Model Embedding +1LSTM-464-1.5295-0.5324.hdf5'
 
-# Embedding using Model API #2 (without activation)
+# Embedding using Model (without activation)
 # inputs = Input(shape=(timesteps,), name='Embeddding-no-activation')
 # l = Embedding(output_dim=timesteps, input_dim=features)(inputs)
 # l = Dropout(0.2)(l)
@@ -495,8 +533,6 @@ load_checkpoint = 'checkpoints/'
 # model = Model(inputs=inputs, outputs=output)
 # model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-print(model.summary())
-
 
 def build_model(dataLength, labelLength):
 
@@ -526,7 +562,7 @@ def build_model(dataLength, labelLength):
 #############################################################################################
 
 
-# load_checkpoint = 'checkpoints/'
+load_checkpoint = 'checkpoints/'
 
 if isfile(load_checkpoint):
     try:
@@ -539,6 +575,7 @@ else:
     print('[*] No model loaded')
     initial_epoch = 0
 
+print(model.summary())
 sleep(5)
 
 # Updates happen after each batch
