@@ -106,7 +106,7 @@ print('Pattern:', ''.join([int_to_char[value] for value in pattern]))
 results = []
 indexes = []
 confidence = []
-for i in range(100):
+for i in range(200):
     x_predict = np.reshape(pattern, (1, 100))
     if normalize:
         x_predict = x_predict / features
@@ -114,11 +114,12 @@ for i in range(100):
     index = np.argmax(prediction)
     confidence.append(prediction[0][index])
     result = int_to_char[index]
+    print(result, end='')
+    sys.stdout.flush()
     results.append(result)
     indexes.append(str(index))
     pattern.append(index)
     pattern = pattern[1:len(pattern)]
-    sys.stdout.write(result)
 # print('results:', ''.join(results))
 print('>> END')
 print('indexes:', ''.join(indexes))
