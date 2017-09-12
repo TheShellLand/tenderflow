@@ -412,11 +412,11 @@ callbacks_list = [
 
 #############################################################################################
 
-batch_size = 100
+batch_size = 128
 seq_length = 100        # input_length
 epochs = 1000000
 initial_epoch = 0
-normalize = True
+normalize = False
 
 X, x, y, samples, timestep, features, char_to_int, int_to_char = char2vec(ds)
 # X, x, y, samples, timestep, features, char_to_int, int_to_char = char2vec_onehot(ds)
@@ -471,8 +471,8 @@ o = Activation('softmax')(o)
 output = o
 model = Model(inputs=inputs, outputs=output)
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-initial_epoch = 15
-load_checkpoint = 'checkpoints/'
+initial_epoch = 8
+load_checkpoint = 'checkpoints/weights-improvement-08-1.9619-0.4309.hdf5'
 
 
 def build_model(dataLength, labelLength):
