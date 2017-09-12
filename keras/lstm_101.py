@@ -7,7 +7,7 @@ http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-m
 
 import keras
 from keras import callbacks
-from keras.models import Model
+from keras.models import Model, load_model
 from keras.layers import Input
 from keras.layers import concatenate
 from keras.models import Sequential
@@ -25,11 +25,13 @@ from os.path import isfile, join
 import numpy
 import numpy as np
 
+import sys
+
 
 ds = '../dataset/training/wonderland.txt'
 t_ds = '../dataset/training/wonderland.txt'
 
-modelName = 'Embedding +64E +128LSTM +128LSTM +activation +dropout'
+modelName = 'Embedding 128 LSTM 256 LSTM activation dropout'
 
 
 def char2vec(dataset):
@@ -88,7 +90,13 @@ def char2vec(dataset):
             x[i, t] = char_to_int[char]
         y[i, char_to_int[Y[i]]] = 1
 
-    return x, y, samples, timestep, features, char_to_int, int_to_char
+    # This normalizes the integer values by the largest integer value.
+    # All values are rescaled to 0-1
+    X = x
+    if normalize:
+        x = x / features
+
+    return X, x, y, samples, timestep, features, char_to_int, int_to_char
 
 
 def char2vec_onehot(dataset):
@@ -173,7 +181,7 @@ def char2vec_onehot(dataset):
     # y = np_utils.to_categorical(y)
     output = y.shape[1]
 
-    return x, y, samples, timesteps, features, char_to_int, int_to_char
+    return X, x, y, samples, timesteps, features, char_to_int, int_to_char
 
 
 def word2vec(dataset):
@@ -389,7 +397,8 @@ checkpoint = 'checkpoints/weights-improvement-{epoch:02d}-{loss:.4f}-{acc:.4f}.h
 callbacks_list = [
     callbacks.TensorBoard(log_dir='logs/Graph/' + modelName,
                           write_graph=True,
-                          write_images=True),
+                          write_images=True,
+                          write_grads=True),
     callbacks.ModelCheckpoint(checkpoint,
                               monitor='loss',
                               verbose=1,
@@ -407,9 +416,10 @@ batch_size = 100
 seq_length = 100        # input_length
 epochs = 1000000
 initial_epoch = 0
+normalize = True
 
-x, y, samples, timestep, features, char_to_int, int_to_char = char2vec(ds)
-# x, y, samples, timesteps, features, char_to_int, int_to_char = char2vec_onehot(ds)
+X, x, y, samples, timestep, features, char_to_int, int_to_char = char2vec(ds)
+# X, x, y, samples, timestep, features, char_to_int, int_to_char = char2vec_onehot(ds)
 x_val, y_val = x, y
 
 
@@ -423,93 +433,6 @@ x_val, y_val = x, y
 # model.add(Dropout(0.2))
 # model.add(Dense(features))
 # model.add(Activation('relu'))
-
-# Embedding using Model (+64Embedding +128LSTM +128LSTM +activation +dropout)
-inputs = Input(shape=(timestep,), name='corpus')
-l = Embedding(output_dim=64, input_dim=features, input_length=seq_length)(inputs)
-l = Dropout(0.2)(l)
-l = LSTM(128, return_sequences=True)(l)
-l = Activation('relu')(l)
-l = Dropout(0.2)(l)
-l = LSTM(128)(l)
-l = Activation('relu')(l)
-l = Dropout(0.2)(l)
-o = Dense(features)(l)
-o = Activation('softmax')(o)
-output = o
-model = Model(inputs=inputs, outputs=output)
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-initial_epoch = 0
-load_checkpoint = 'checkpoints/'
-
-# Embedding using Model (+64Embedding +64LSTM +128LSTM +activation +dropout)
-# inputs = Input(shape=(timestep,), name='corpus')
-# l = Embedding(output_dim=64, input_dim=features, input_length=seq_length)(inputs)
-# l = Dropout(0.2)(l)
-# l = LSTM(64, return_sequences=True)(l)
-# l = Activation('relu')(l)
-# l = Dropout(0.2)(l)
-# l = LSTM(128)(l)
-# l = Activation('relu')(l)
-# l = Dropout(0.2)(l)
-# o = Dense(features)(l)
-# o = Activation('softmax')(o)
-# output = o
-# model = Model(inputs=inputs, outputs=output)
-# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-# initial_epoch = 0
-# load_checkpoint = 'checkpoints/Embedding +64E +64LSTM +128LSTM +activation +dropout-187-1.3280-0.5864.hdf5'
-
-# Embedding using Model (+64Embedding +64LSTM +64LSTM +activation +dropout) (197s)
-# inputs = Input(shape=(timestep,), name='corpus')
-# l = Embedding(output_dim=64, input_dim=features, input_length=seq_length)(inputs)
-# l = Dropout(0.2)(l)
-# l = LSTM(64, return_sequences=True)(l)
-# l = Activation('relu')(l)
-# l = Dropout(0.2)(l)
-# l = LSTM(64)(l)
-# l = Activation('relu')(l)
-# l = Dropout(0.2)(l)
-# o = Dense(features)(l)
-# o = Activation('softmax')(o)
-# output = o
-# model = Model(inputs=inputs, outputs=output)
-# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-# initial_epoch = 65
-# load_checkpoint = 'checkpoints/Embedding +64E +64LSTM +64LSTM +activation +dropout-66-1.8471-0.4574.hdf5'
-# initial_epoch = 465
-# load_checkpoint = 'checkpoints/Embedding +2LSTM +activation +dropout-138-1.6984-0.4886.hdf5'
-
-# Embedding using Model (+1LSTM)
-# inputs = Input(shape=(timesteps,), name='corpus')
-# l = Embedding(output_dim=timesteps, input_dim=features)(inputs)
-# l = Dropout(0.2)(l)
-# l = LSTM(64, return_sequences=False)(l)
-# l = Activation('relu')(l)
-# l = Dropout(0.2)(l)
-# o = Dense(features)(l)
-# o = Activation('softmax')(o)
-# output = o
-# model = Model(inputs=inputs, outputs=output)
-# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-# initial_epoch = 465
-# load_checkpoint = 'checkpoints/Model Embedding +1LSTM-464-1.5295-0.5324.hdf5'
-
-# Embedding using Model (without activation)
-# inputs = Input(shape=(timesteps,), name='Embeddding-no-activation')
-# l = Embedding(output_dim=timesteps, input_dim=features)(inputs)
-# l = Dropout(0.2)(l)
-# l = LSTM(64, return_sequences=True)(l)
-# l = Dropout(0.2)(l)
-# l = LSTM(64)(l)
-# l = Dropout(0.2)(l)
-# o = Dense(features)(l)
-# o = Activation('softmax')(o)
-# output = o
-# model = Model(inputs=inputs, outputs=output)
-# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-# initial_epoch = 54
-# load_checkpoint = 'checkpoints/'
 
 # one-hot
 # model = Sequential()
@@ -532,6 +455,24 @@ load_checkpoint = 'checkpoints/'
 # output = Activation('relu')(output)
 # model = Model(inputs=inputs, outputs=output)
 # model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+# Embedding using Model (Embedding 128 LSTM 256 LSTM activation dropout) (178s)
+inputs = Input(shape=(timestep,), name='corpus')
+l = Embedding(output_dim=features, input_dim=features, input_length=seq_length)(inputs)
+l = Dropout(0.2)(l)
+l = LSTM(128, return_sequences=True)(l)
+l = Activation('relu')(l)
+l = Dropout(0.2)(l)
+l = LSTM(256)(l)
+l = Activation('relu')(l)
+l = Dropout(0.2)(l)
+o = Dense(features)(l)
+o = Activation('softmax')(o)
+output = o
+model = Model(inputs=inputs, outputs=output)
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+initial_epoch = 15
+load_checkpoint = 'checkpoints/'
 
 
 def build_model(dataLength, labelLength):
@@ -562,11 +503,11 @@ def build_model(dataLength, labelLength):
 #############################################################################################
 
 
-load_checkpoint = 'checkpoints/'
+#load_checkpoint = 'checkpoints/'
 
 if isfile(load_checkpoint):
     try:
-        model.load_weights(load_checkpoint)
+        model = load_model(load_checkpoint)
         print('[*] Checkpoint loaded', load_checkpoint)
     except Exception as err:
         print('[*] Checkpoint load failed:', err)
@@ -576,9 +517,8 @@ else:
     initial_epoch = 0
 
 print(model.summary())
-sleep(5)
+sleep(2)
 
-# Updates happen after each batch
 history = model.fit(x, y,
                     batch_size=batch_size,
                     epochs=epochs,
@@ -589,11 +529,43 @@ history = model.fit(x, y,
                     shuffle=False,
                     initial_epoch=initial_epoch)
 
-# loss, acc = history.history['loss'], history.history['acc']
-# print('loss:', loss, 'acc:', acc)
-
-# score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
-# print('score:', score, 'accuracy:', acc)
-
-prediction = model.predict()
-print(prediction)
+# Updates happen after each batch
+# for epoch in range(initial_epoch, 1000000):
+#     print('Epoch:', epoch)
+#     history = model.fit(x, y,
+#                         batch_size=batch_size,
+#                         epochs=initial_epoch + 1,
+#                         verbose=1,
+#                         callbacks=callbacks_list,
+#                         # validation_data=(x_val, y_val),
+#                         # validation_split=0.33,
+#                         shuffle=False,
+#                         initial_epoch=initial_epoch)
+#     initial_epoch += 1
+#
+#     # loss, acc = history.history['loss'], history.history['acc']
+#     # print('loss:', loss, 'acc:', acc)
+#
+#     # score, acc = model.evaluate(x, y, batch_size=batch_size, verbose=1)
+#     # print('score:', score, 'accuracy:', acc)
+#
+#     start = np.random.randint(0, samples-1)
+#     pattern = list(X[start])
+#     print('Pattern:', ''.join([int_to_char[value] for value in pattern]))
+#     results = []
+#     indexes = []
+#     confidence = []
+#     for i in range(50):
+#         x_predict = np.reshape(pattern, (1, 100))
+#         if normalize:
+#             x_predict = x_predict / features
+#         prediction = model.predict(x_predict)
+#         index = np.argmax(prediction)
+#         confidence.append(prediction[0][index])
+#         result = int_to_char[index]
+#         results.append(result)
+#         indexes.append(str(index))
+#         pattern.append(index)
+#         pattern = pattern[1:len(pattern)]
+#     print('results:', ''.join(results))
+#     print('indexes:', ''.join(indexes))
